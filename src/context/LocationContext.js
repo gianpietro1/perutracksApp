@@ -6,14 +6,30 @@ const locationReducer = (state, action) => {
       return { ...state, currentLocation: action.payload };
     case "add_location":
       return { ...state, locations: [...state.locations, action.payload] };
+    case "add_landmark":
+      return { ...state, landmarks: [...state.landmarks, action.payload] };
     case "start_recording":
-      return { ...state, recording: true };
+      return {
+        ...state,
+        recording: true,
+        deltaFactor: 1,
+      };
     case "stop_recording":
-      return { ...state, recording: false };
+      return {
+        ...state,
+        recording: false,
+        deltaFactor: 3,
+      };
     case "change_name":
       return { ...state, name: action.payload };
     case "reset":
-      return { ...state, name: "", locations: [] };
+      return {
+        ...state,
+        name: "",
+        currentLocation: null,
+        locations: [],
+        landmarks: [],
+      };
     default:
       return state;
   }
@@ -38,12 +54,32 @@ const addLocation = (dispatch) => (location, recording) => {
   }
 };
 
+const addLandmark = (dispatch) => (location, name) => {
+  const landmark = { name, coords: location.coords };
+  dispatch({ type: "add_landmark", payload: landmark });
+};
+
 const reset = (dispatch) => () => {
   dispatch({ type: "reset" });
 };
 
 export const { Context, Provider } = createDataContext(
   locationReducer,
-  { startRecording, stopRecording, addLocation, changeName, reset },
-  { recording: false, name: "", locations: [], currentLocation: null }
+  {
+    startRecording,
+    stopRecording,
+    addLocation,
+    addLandmark,
+    changeName,
+    reset,
+  },
+  {
+    recording: false,
+    name: "",
+    locations: [],
+    landmarks: [],
+    currentLocation: null,
+    currentRegion: null,
+    deltaFactor: 3,
+  }
 );

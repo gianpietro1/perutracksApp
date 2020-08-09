@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   Dimensions,
+  Button,
 } from "react-native";
 import ShowImage from "../components/ShowImage";
 import { Context as TrackContext } from "../context/TrackContext";
@@ -16,8 +17,12 @@ const TrackListScreen = ({ navigation }) => {
   const { state, fetchTracks } = useContext(TrackContext);
 
   useEffect(() => {
-    fetchTracks();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchTracks();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <FlatList
@@ -26,6 +31,7 @@ const TrackListScreen = ({ navigation }) => {
       renderItem={({ item }) => {
         return (
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={() =>
               navigation.navigate("TrackDetail", {
                 _id: item._id,
@@ -68,6 +74,11 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 12,
     color: "white",
+  },
+  buttonEdit: {
+    position: "absolute",
+    top: 10,
+    right: 10,
   },
 });
 

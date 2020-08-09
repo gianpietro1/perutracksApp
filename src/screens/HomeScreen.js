@@ -7,7 +7,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <>
       <Image
-        style={{ ...styles.imageBackground, opacity: 0.7 }}
+        style={{ ...styles.imageBackground, opacity: 0.8 }}
         source={portada}
       />
       <View style={styles.view}>
@@ -42,8 +42,6 @@ const styles = StyleSheet.create({
   imageBackground: {
     resizeMode: "cover",
     position: "absolute",
-    top: 0,
-    left: 0,
   },
   button: {
     marginTop: 20,

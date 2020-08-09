@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
-import { Text, StyleSheet, ActivityIndicator } from "react-native";
-import MapView, { Polyline, Circle } from "react-native-maps";
+import { StyleSheet, ActivityIndicator } from "react-native";
+import MapView, { Polyline, Circle, Marker } from "react-native-maps";
 import { Context as LocationContext } from "../context/LocationContext";
 
 const Map = () => {
   const {
-    state: { currentLocation, locations },
+    state: { currentLocation, locations, landmarks },
   } = useContext(LocationContext);
 
   if (!currentLocation) {
@@ -29,11 +29,25 @@ const Map = () => {
       >
         <Circle
           center={currentLocation.coords}
-          radius={50}
+          radius={30}
           strokeColor="rgba(158,158,255, 1.0)"
-          fillColor="rgba(158,158,255, 0.3)"
+          fillColor="rgba(158,158,255, 0.5)"
         />
-        <Polyline coordinates={locations.map((loc) => loc.coords)} />
+        <Polyline
+          coordinates={locations.map((loc) => loc.coords)}
+          strokeColor="red"
+          strokeWidth={3}
+        />
+
+        {landmarks
+          ? landmarks.map((marker) => (
+              <Marker
+                key={marker.name}
+                coordinate={marker.coords}
+                title={marker.name}
+              />
+            ))
+          : null}
       </MapView>
     </>
   );
