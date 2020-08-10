@@ -31,7 +31,12 @@
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
       ],
-      "useNextNotificationsApi": true
+      "useNextNotificationsApi": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB17FXpCWjwM2u_sNtZ93SZtX45e50QlWg"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
