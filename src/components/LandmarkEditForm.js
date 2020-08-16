@@ -7,21 +7,15 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { Input, Button, Image, Card } from "react-native-elements";
-import ShowImage from "../components/ShowImage";
+import ShowImage from "./ShowImage";
 
-const TrackEditForm = ({ initialValues, submit, cancel, deleteImage }) => {
+const LandmarkEditForm = ({ initialValues, submit, cancel, deleteImage }) => {
   const [name, setName] = useState(initialValues.name || "");
   const [description, setDescription] = useState(
     initialValues.description || ""
   );
-  const [shortDescription, setShortDescription] = useState(
-    initialValues.shortDescription || ""
-  );
   const [image, setImage] = useState(initialValues.image || "");
-  const [video, setVideo] = useState(initialValues.video || "");
-
   const [localImage, setLocalImage] = useState(null);
-
   const [isLoading, setIsLoading] = useState(false);
 
   const pickImage = async () => {
@@ -50,7 +44,7 @@ const TrackEditForm = ({ initialValues, submit, cancel, deleteImage }) => {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
+      style={{ flex: 1, flexDirection: "column", justifyContent: "flex-start" }}
       behavior={Platform.OS === "ios" ? "padding" : null}
       enabled
       keyboardVerticalOffset={100}
@@ -60,11 +54,17 @@ const TrackEditForm = ({ initialValues, submit, cancel, deleteImage }) => {
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
         >
-          <View style={{ alignItems: "center" }}>
+          <View
+            style={{
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 10,
+            }}
+          >
             {localImage ? (
               <Image
                 source={{ uri: localImage }}
-                style={{ width: 200, height: 200, alignSelf: "center" }}
+                style={{ width: 200, height: 200 }}
               />
             ) : (
               <ShowImage url={image} width={200} height={200} />
@@ -79,12 +79,6 @@ const TrackEditForm = ({ initialValues, submit, cancel, deleteImage }) => {
             label="Nombre"
             value={name}
             onChangeText={setName}
-            autoCorrect={false}
-          />
-          <Input
-            label="Descripción corta"
-            value={shortDescription}
-            onChangeText={setShortDescription}
             autoCorrect={false}
           />
           <Input
@@ -109,7 +103,6 @@ const TrackEditForm = ({ initialValues, submit, cancel, deleteImage }) => {
                 onPress={() => {
                   submit({
                     name,
-                    shortDescription,
                     description,
                     image: localImage,
                   });
@@ -135,4 +128,4 @@ const styles = StyleSheet.create({
   buttonLeft: { margin: 2, backgroundColor: "#dc3545" },
   buttonRight: { margin: 2, backgroundColor: "#28a745" },
 });
-export default TrackEditForm;
+export default LandmarkEditForm;

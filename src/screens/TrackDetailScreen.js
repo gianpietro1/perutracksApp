@@ -1,14 +1,19 @@
 //import "../_mockLocation";
-import React, { useContext, useCallback } from "react";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import { Card, Button, ListItem } from "react-native-elements";
+import React, { useContext, useCallback, useState, useRef } from "react";
+import { StyleSheet, Text, Dimensions, ScrollView, View } from "react-native";
+import { Card, Button, Image } from "react-native-elements";
+import MapView, { Circle, Polyline, Marker } from "react-native-maps";
+import LandmarksDeck from "../components/LandmarksDeck";
 import useLocation from "../hooks/useLocation";
 import { Context as TrackContext } from "../context/TrackContext";
 import { Context as LocationContext } from "../context/LocationContext";
 
-import MapView, { Circle, Polyline, Marker } from "react-native-maps";
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height;
 
 const TrackDetailScreen = ({ route, navigation }) => {
+  const [scroll, setScroll] = useState(true);
+  const [selectedMarker, setSelectedMarker] = useState(null);
   const { state } = useContext(TrackContext);
   const {
     state: { recording, currentLocation, locations, deltaFactor },
@@ -52,34 +57,31 @@ const TrackDetailScreen = ({ route, navigation }) => {
   );
   const [err] = useLocation(recording, callback);
 
-  const renderLandmarks = () => {
-    return (
-      <>
-        <View style={styles.dividerView}>
-          <Text style={styles.dividerText}>PUNTOS DE INTERÉS</Text>
-        </View>
-        {track.landmarks.map((item) => {
-          return (
-            <ListItem
-              key={item.coords.latitude * Math.random()}
-              title={item.name}
-              subtitle={`Lat: ${item.coords.latitude.toFixed(
-                4
-              )}, Long: ${item.coords.longitude.toFixed(4)}`}
-              subtitleStyle={{ color: "grey", fontSize: 12 }}
-              bottomDivider
-            />
-          );
-        })}
-      </>
-    );
+  const controlScroll = (value) => {
+    value === true ? setScroll(true) : setScroll(false);
   };
 
+  const landmarkToMarker = (landmarkId) => {
+    setSelectedMarker(landmarkId);
+  };
+
+  const scrollRef = useRef();
+  const markerRef = useRef();
+
   return (
-    <Card>
+    <View style={styles.trackView}>
       <ScrollView
         keyboardShouldPersistTaps="always"
         showsVerticalScrollIndicator={false}
+        scrollEnabled={scroll}
+        ref={scrollRef}
+        onScrollEndDrag={({ nativeEvent }) => {
+          nativeEvent.contentOffset.y >= SCREEN_WIDTH / 1.5
+            ? scrollRef.current.scrollToEnd({
+                animated: true,
+              })
+            : null;
+        }}
       >
         <MapView
           style={styles.map}
@@ -123,14 +125,18 @@ const TrackDetailScreen = ({ route, navigation }) => {
           {track.landmarks
             ? track.landmarks.map((marker) => (
                 <Marker
-                  key={marker.name}
+                  key={marker._id}
                   coordinate={marker.coords}
                   title={marker.name}
+                  pinColor={marker._id !== selectedMarker ? "red" : "green"}
+                  ref={markerRef}
+                  onPress={() => {
+                    setSelectedMarker(marker._id);
+                  }}
                 />
               ))
             : null}
         </MapView>
-
         {recording ? (
           <Button
             buttonStyle={styles.buttonStop}
@@ -149,16 +155,32 @@ const TrackDetailScreen = ({ route, navigation }) => {
             }}
           />
         )}
-        <Text style={styles.description}>{track.description}</Text>
-        {track.landmarks.length ? renderLandmarks() : null}
+        <Text style={styles.description} selectable>
+          {track.description}
+        </Text>
+        {track.landmarks.length ? (
+          <LandmarksDeck
+            data={track.landmarks}
+            controlScroll={controlScroll}
+            track={track}
+            markerToLandmark={selectedMarker}
+            landmarkToMarker={landmarkToMarker}
+          />
+        ) : null}
       </ScrollView>
-    </Card>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  trackView: {
+    padding: 20,
+    backgroundColor: "white",
+    flex: 1,
+  },
   map: {
-    height: 300,
+    width: 0.9 * SCREEN_WIDTH,
+    height: 0.9 * SCREEN_WIDTH,
   },
   description: {
     color: "#3f3f3f",
@@ -170,16 +192,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     backgroundColor: "#dc3545",
   },
-  dividerText: {
-    fontSize: 12,
-    color: "#3f3f3f",
-    textAlign: "center",
-  },
-  dividerView: {
-    marginTop: 15,
-    backgroundColor: "#eaeaea",
-    borderRadius: 10,
-    padding: 5,
+  landmarkView: {
+    height: 250,
   },
 });
 

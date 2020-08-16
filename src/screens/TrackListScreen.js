@@ -39,7 +39,7 @@ const TrackListScreen = ({ navigation }) => {
               })
             }
           >
-            <View style={styles.card}>
+            <View>
               <ShowImage
                 url={item.image}
                 width={SCREEN_WIDTH}
@@ -58,7 +58,6 @@ const TrackListScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  card: {},
   imageText: {
     position: "absolute",
     bottom: 0,

@@ -10,6 +10,7 @@ import TrackListScreen from "./src/screens/TrackListScreen";
 import TrackDetailScreen from "./src/screens/TrackDetailScreen";
 import TrackCreateScreen from "./src/screens/TrackCreateScreen";
 import TrackEditScreen from "./src/screens/TrackEditScreen";
+import LandmarkEditScreen from "./src/screens/LandmarkEditScreen";
 
 const Main = createStackNavigator();
 
@@ -67,6 +68,11 @@ export default function App() {
               name="TrackEdit"
               component={TrackEditScreen}
               options={{ headerTitle: "Editar Ruta" }}
+            />
+            <Main.Screen
+              name="LandmarkEdit"
+              component={LandmarkEditScreen}
+              options={{ headerTitle: "Editar Punto de Interés" }}
             />
           </Main.Navigator>
         </NavigationContainer>

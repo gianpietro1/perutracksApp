@@ -17,9 +17,11 @@ const trackReducer = (state, action) => {
   }
 };
 
-const uploadResized = async (image) => {
+const uploadResized = async (image, type) => {
   // Update image in S3
-  const uploadConfigNormal = await trackerApi.get("/upload");
+  const uploadConfigNormal = await trackerApi.get("/upload", {
+    params: { type },
+  });
   const imageNew = await ImageManipulator.manipulateAsync(
     image,
     [{ resize: { width: 500 }, format: "jpeg" }],
@@ -52,7 +54,7 @@ const createTrack = (dispatch) => async (name, locations, landmarks) => {
 const editTrack = (dispatch) => async (id, trackObject, callback) => {
   if (trackObject["image"]) {
     // Upload to S3
-    const imageUrls = await uploadResized(trackObject["image"]);
+    const imageUrls = await uploadResized(trackObject["image"], "tracks");
     // Update project info in MongoDB
     const imageUrl = imageUrls.keyNormal;
     trackObject["image"] = imageUrl;
@@ -64,8 +66,37 @@ const editTrack = (dispatch) => async (id, trackObject, callback) => {
   callback();
 };
 
+const editLandmark = (dispatch) => async (
+  landmarkId,
+  landmarkObject,
+  track,
+  callback
+) => {
+  if (landmarkObject["image"]) {
+    // Upload to S3
+    const imageUrls = await uploadResized(landmarkObject["image"], "landmarks");
+    // Update project info in MongoDB
+    const imageUrl = imageUrls.keyNormal;
+    landmarkObject["image"] = imageUrl;
+  } else {
+    delete landmarkObject["image"];
+  }
+
+  const landmarks = track.landmarks.map((landmark) => {
+    return landmark._id === landmarkId
+      ? Object.assign(landmark, landmarkObject)
+      : landmark;
+  });
+  track.landmarks = landmarks;
+  delete track.image;
+
+  const response = await trackerApi.put(`/tracks/${track._id}`, track);
+  dispatch({ type: "edit_track", payload: response.data });
+  callback();
+};
+
 export const { Provider, Context } = createDataContext(
   trackReducer,
-  { fetchTracks, createTrack, editTrack, deleteTrackImage },
+  { fetchTracks, createTrack, editTrack, editLandmark, deleteTrackImage },
   []
 );

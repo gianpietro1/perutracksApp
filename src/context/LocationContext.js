@@ -54,8 +54,8 @@ const addLocation = (dispatch) => (location, recording) => {
   }
 };
 
-const addLandmark = (dispatch) => (location, name) => {
-  const landmark = { name, coords: location.coords };
+const addLandmark = (dispatch) => (location, name, description) => {
+  const landmark = { name, description, coords: location.coords };
   dispatch({ type: "add_landmark", payload: landmark });
 };
 

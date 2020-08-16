@@ -11,6 +11,7 @@ const ShowAvatar = ({ url, width, height }) => {
         width,
         height,
       }}
+      containerStyle={{ alignSelf: "center" }}
     />
   );
 };

@@ -13,7 +13,7 @@ import Map from "../components/Map";
 import useLocation from "../hooks/useLocation";
 import TrackForm from "../components/TrackForm";
 
-const TrackCreateScreen = () => {
+const TrackCreateScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
 
   const {
@@ -27,6 +27,10 @@ const TrackCreateScreen = () => {
     },
     [recording]
   );
+
+  const goBack = () => {
+    navigation.pop();
+  };
 
   const [err] = useLocation(isFocused || recording, callback);
 
@@ -44,7 +48,7 @@ const TrackCreateScreen = () => {
         >
           <Map />
           {err ? <Text>Please enable location services.</Text> : null}
-          <TrackForm />
+          <TrackForm goBack={goBack} />
         </ScrollView>
       </Card>
     </KeyboardAvoidingView>
